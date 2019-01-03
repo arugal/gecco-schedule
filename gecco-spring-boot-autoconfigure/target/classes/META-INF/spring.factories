@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.geccocrawler.boot.gecco.autoconfigure.GeccoAutoConfiguration
+
+org.springframework.context.ApplicationListener=\
+com.geccocrawler.boot.gecco.context.event.WelcomeLogoApplicationListener

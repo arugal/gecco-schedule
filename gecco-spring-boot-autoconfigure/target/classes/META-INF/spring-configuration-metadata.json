@@ -1,0 +1,63 @@
+{
+  "groups": [
+    {
+      "name": "gecco",
+      "type": "com.geccocrawler.boot.gecco.GeccoProperties",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "gecco.class-path",
+      "type": "java.lang.String",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties"
+    },
+    {
+      "name": "gecco.debug",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "gecco.mobile",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "gecco.n-threand",
+      "type": "java.lang.Integer",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties",
+      "defaultValue": 1
+    },
+    {
+      "name": "gecco.pipeline-factory",
+      "type": "com.geccocrawler.gecco.pipeline.PipelineFactory",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties"
+    },
+    {
+      "name": "gecco.proxy",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "gecco.proxys",
+      "type": "com.geccocrawler.gecco.downloader.proxy.Proxys",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties"
+    },
+    {
+      "name": "gecco.retry",
+      "type": "java.lang.Integer",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "gecco.thread-prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.geccocrawler.boot.gecco.GeccoProperties",
+      "defaultValue": "spider-thread"
+    }
+  ],
+  "hints": []
+}

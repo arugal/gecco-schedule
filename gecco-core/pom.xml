@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>gecco-schedule</artifactId>
+        <groupId>com.geccocrawler</groupId>
+        <version>1.3.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>gecco-core</artifactId>
+
+    <packaging>jar</packaging>
+
+    <properties>
+        <commons.logging.version>1.2</commons.logging.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.geccocrawler</groupId>
+            <artifactId>gecco</artifactId>
+            <version>${gecco.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+</project>

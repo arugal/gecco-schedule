@@ -1,0 +1,8 @@
+gecco:
+  class-path: com.geccocrawler.boot.gecco
+  n-threand: 1
+  thread-prefix: demo-spider-thread
+  mobile: false
+  debug: false
+  retry: 3
+  proxy: false
