@@ -1,6 +1,6 @@
 package com.geccocrawler.boot.gecco;
 
-import com.geccocrawler.boot.gecco.spider.SpringSpiderLoopGroup;
+import com.geccocrawler.gecco.spider.SpiderLoopGroup;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
@@ -23,7 +23,7 @@ public class GeccoApplicationDemo {
     public static void main(String[] args) {
         ApplicationContext context = new SpringApplicationBuilder(GeccoApplicationDemo.class).run(args);
 
-        SpringSpiderLoopGroup group = context.getBean(SpringSpiderLoopGroup.class);
+        SpiderLoopGroup group = context.getBean(SpiderLoopGroup.class);
 
         for(String url : urls){
             group.executor(url);

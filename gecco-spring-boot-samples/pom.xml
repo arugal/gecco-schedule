@@ -20,5 +20,9 @@
             <artifactId>gecco-spring-boot-starter</artifactId>
             <version>${gecco.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
     </dependencies>
 </project>

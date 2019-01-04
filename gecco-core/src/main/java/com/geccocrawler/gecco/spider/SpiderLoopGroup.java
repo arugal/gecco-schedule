@@ -1,6 +1,8 @@
 package com.geccocrawler.gecco.spider;
 
-import com.geccocrawler.gecco.util.SystemPropertyUtil;
+import com.geccocrawler.gecco.GeccoEngine;
+
+import static com.geccocrawler.gecco.spider.SpiderConfig.DEFAULT_SPIDER_LOOP_THREADS;
 
 /**
  * @author: zhangwei
@@ -8,21 +10,46 @@ import com.geccocrawler.gecco.util.SystemPropertyUtil;
  */
 public class SpiderLoopGroup extends MultiSpiderExecutorGroup{
 
-
-    private static final int DEFAULT_EXECUTOR_LOOP_THREADS;
-
-    static {
-        DEFAULT_EXECUTOR_LOOP_THREADS = Math.max(1 , SystemPropertyUtil.getInt("io.spider.executor.threads", Runtime.getRuntime().availableProcessors()));
-    }
-
+    private GeccoEngine engine;
 
     public SpiderLoopGroup(String classPath){
-        super(DEFAULT_EXECUTOR_LOOP_THREADS, classPath);
+        super(DEFAULT_SPIDER_LOOP_THREADS, new SpiderConfig(classPath));
     }
 
+    public SpiderLoopGroup(SpiderConfig spiderConfig){
+        super(spiderConfig.getNThreand(), spiderConfig);
+    }
 
     @Override
     protected SpiderExecutor newChild(Object ... args) {
-        return new SpiderLoop(this, (String) args[0]);
+        SpiderConfig spiderConfig = (SpiderConfig) args[0];
+        if(engine == null){
+            engine = newGeccoEngic(spiderConfig);
+        }
+        return new SpiderLoop(this, engine, new NamedThreadFactory(spiderConfig.getThreadPrefix()), spiderConfig);
+    }
+
+    private static GeccoEngine newGeccoEngic(SpiderConfig spiderConfig){
+        GeccoEngine engine;
+        if(spiderConfig.getPipelineFactory() == null){
+            engine = GeccoEngine.create(spiderConfig.getClassPath());
+        }else{
+            engine = GeccoEngine.create(spiderConfig.getClassPath(), spiderConfig.getPipelineFactory());
+        }
+
+        if(spiderConfig.getProxys() != null){
+            engine.proxysLoader(spiderConfig.getProxys());
+        }
+
+        engine.monitor(spiderConfig.isMobile())
+                .debug(spiderConfig.isDebug())
+                .proxy(spiderConfig.isProxy())
+                .retry(spiderConfig.getRetry())
+                .thread(1)
+                .loop(true)
+                .monitor(false);
+        engine.run();
+        engine.engineStop();
+        return engine;
     }
 }

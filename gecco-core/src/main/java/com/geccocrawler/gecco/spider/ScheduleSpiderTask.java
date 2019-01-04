@@ -1,5 +1,6 @@
 package com.geccocrawler.gecco.spider;
 
+import com.geccocrawler.gecco.GeccoEngine;
 import com.geccocrawler.gecco.downloader.*;
 import com.geccocrawler.gecco.pipeline.Pipeline;
 import com.geccocrawler.gecco.request.HttpRequest;
@@ -26,22 +27,27 @@ public class ScheduleSpiderTask extends ScheduleTask {
 
     private SpiderBeanContext spiderBeanContext;
 
-    public ScheduleSpiderTask(SpiderExecutor executor, SpiderBeanFactory spiderBeanFactory, HttpRequest request) {
+    private final GeccoEngine engine;
+
+    public ScheduleSpiderTask(SpiderExecutor executor, SpiderBeanFactory spiderBeanFactory, HttpRequest request, GeccoEngine engine) {
         super(executor);
         this.spiderBeanFactory = spiderBeanFactory;
         this.request = request;
+        this.engine = engine;
     }
 
-    public ScheduleSpiderTask(SpiderExecutor executor, long nanoTime, long period, SpiderBeanFactory spiderBeanFactory, HttpRequest request) {
+    public ScheduleSpiderTask(SpiderExecutor executor, long nanoTime, long period, SpiderBeanFactory spiderBeanFactory, HttpRequest request, GeccoEngine engine) {
         super(executor, nanoTime, period);
         this.spiderBeanFactory = spiderBeanFactory;
         this.request = request;
+        this.engine = engine;
     }
 
-    public ScheduleSpiderTask(SpiderExecutor executor, long nanoTime, SpiderBeanFactory spiderBeanFactory, HttpRequest request) {
+    public ScheduleSpiderTask(SpiderExecutor executor, long nanoTime, SpiderBeanFactory spiderBeanFactory, HttpRequest request, GeccoEngine engine) {
         super(executor, nanoTime);
         this.spiderBeanFactory = spiderBeanFactory;
         this.request = request;
+        this.engine = engine;
     }
 
     @Override
@@ -49,6 +55,10 @@ public class ScheduleSpiderTask extends ScheduleTask {
         if(currSpiderBeanClass == null) {
             currSpiderBeanClass = spiderBeanFactory.matchSpider(request);
         }
+        if(log.isDebugEnabled()){
+            log.debug("match url : "+request.getUrl()+"/"+(currSpiderBeanClass == null ? "null" : currSpiderBeanClass.getName()));
+        }
+
         HttpResponse response = null;
         try {
             if(currSpiderBeanClass == null){
@@ -60,10 +70,12 @@ public class ScheduleSpiderTask extends ScheduleTask {
                 }
             }else{
                 if(spiderBeanContext == null) {
+                    // 获取 SpiderBean 的上下文, downloader, beforeDownloader, afterDownloader, render, piplines
                     spiderBeanContext = spiderBeanFactory.getContext(currSpiderBeanClass);
                 }
                 response = download(spiderBeanContext, request);
                 if(response.getStatus() == 200){
+                    // render
                     Render render = spiderBeanContext.getRender();
 
                     SpiderBean spiderBean = null;
@@ -76,10 +88,14 @@ public class ScheduleSpiderTask extends ScheduleTask {
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
-            log.error(request.getUrl() + "ERROR : "+ e.getClass().getName() + e.getMessage());
+            log.error(String.format("%s ERROR %s/%s", request.getUrl(), e.getClass().getName(), e.getMessage()), e);
             if(e instanceof DownloadTimeoutException){
                 // 开启代理，并且获取代理不为 null
+                if(engine.isProxy() && engine.getProxysLoader().getProxy() != null){
+                    if(log.isDebugEnabled()){
+                        log.debug(request.getUrl()+" ERROR : connect time out!");
+                    }
+                }
             }
         }finally {
             if(response != null){

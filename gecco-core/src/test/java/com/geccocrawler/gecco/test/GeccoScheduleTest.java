@@ -17,7 +17,7 @@ public class GeccoScheduleTest {
     public static void main(String[] args) throws InterruptedException {
         SpiderExecutorGroup group = new SpiderLoopGroup("com.geccocrawler.gecco.test");
 
-        group.scheduleAtFixedRate(url, 0, 20, TimeUnit.SECONDS);
+        group.scheduleWithFixedDelay(url, 0, 20, TimeUnit.SECONDS);
 
         Scanner scanner = new Scanner(System.in, "UTF-8");
 
@@ -38,7 +38,7 @@ public class GeccoScheduleTest {
         if(!group.isShuttingDown()){
             group.shutdown();
         }
-        Thread.sleep(5000L);
-        System.out.println("over");
+
+        System.out.println("over!");
     }
 }

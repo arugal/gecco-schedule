@@ -12,8 +12,6 @@ import java.security.PrivilegedAction;
  */
 public final class SystemPropertyUtil {
 
-
-
     private static final Log logger = LogFactory.getLog(SystemPropertyUtil.class);
 
     public static int getInt(String key, int def) {

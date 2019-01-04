@@ -3,11 +3,11 @@ package com.geccocrawler.boot.gecco;
 import com.geccocrawler.gecco.downloader.proxy.Proxys;
 import com.geccocrawler.gecco.pipeline.PipelineFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import static com.geccocrawler.boot.gecco.util.GeccoUtil.GECCO_PREFIX;
+import static com.geccocrawler.gecco.spider.SpiderConfig.*;
 /**
  * @author: zhangwei
  * @date: 20:56/2019-01-03
@@ -17,21 +17,21 @@ import static com.geccocrawler.boot.gecco.util.GeccoUtil.GECCO_PREFIX;
         prefix = GECCO_PREFIX,
         ignoreInvalidFields = true
 )
-public class GeccoProperties {
+public class GeccoConfig {
 
     private String classPath;
 
-    private int nThreand = 1;
+    private int nThreand = DEFAULT_SPIDER_LOOP_THREADS;
 
-    private String threadPrefix = "spider-thread";
+    private String threadPrefix = DEFAULT_THREAD_PREFIX;
 
-    private boolean mobile = false;
+    private boolean mobile = DEFAULT_IS_MOBILE;
 
-    private boolean debug = false;
+    private boolean debug = DEFAULT_IS_DEBUG;
 
-    private int retry = 3;
+    private int retry = DEFAULT_RETRY;
 
-    private boolean proxy = false;
+    private boolean proxy = DEFAULT_IS_PROXY;
 
     @Autowired
     private PipelineFactory pipelineFactory;
