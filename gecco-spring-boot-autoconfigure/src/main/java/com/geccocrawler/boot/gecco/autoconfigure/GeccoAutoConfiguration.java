@@ -8,12 +8,16 @@ import com.geccocrawler.gecco.downloader.proxy.Proxys;
 import com.geccocrawler.gecco.pipeline.PipelineFactory;
 import com.geccocrawler.gecco.spider.SpiderConfig;
 import com.geccocrawler.gecco.spider.SpiderLoopGroup;
+import com.geccocrawler.gecco.spider.linstener.SpiderExecutorListener;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Map;
 
 import static com.geccocrawler.boot.gecco.util.GeccoUtil.GECCO_PREFIX;
 
@@ -29,7 +33,7 @@ public class GeccoAutoConfiguration {
 
     @Bean(destroyMethod = "shutdown")
     @ConditionalOnProperty(prefix = GECCO_PREFIX, name = "classpath")
-    public SpiderLoopGroup getSpiderLoopGroup(GeccoConfig geccoConfig){
+    public SpiderLoopGroup getSpiderLoopGroup(GeccoConfig geccoConfig, ApplicationContext context){
         SpiderConfig spiderConfig = new SpiderConfig()
                 .classPath(geccoConfig.getClassPath())
                 .nThreand(geccoConfig.getnThreand())
@@ -40,7 +44,13 @@ public class GeccoAutoConfiguration {
                 .proxy(geccoConfig.isProxy())
                 .pipelineFactory(geccoConfig.getPipelineFactory())
                 .proxys(geccoConfig.getProxys());
-        return new SpiderLoopGroup(spiderConfig);
+        SpiderLoopGroup group = new SpiderLoopGroup(spiderConfig);
+        // listener
+        Map<String, SpiderExecutorListener> listenerMap = context.getBeansOfType(SpiderExecutorListener.class);
+        for(SpiderExecutorListener listener : listenerMap.values()){
+            group.addEngicListener(listener);
+        }
+        return group;
     }
 
 
