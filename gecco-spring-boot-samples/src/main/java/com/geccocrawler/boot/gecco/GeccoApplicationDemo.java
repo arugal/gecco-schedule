@@ -1,15 +1,18 @@
 package com.geccocrawler.boot.gecco;
 
+import com.geccocrawler.boot.gecco.listener.ListannerSamples;
 import com.geccocrawler.gecco.spider.SpiderLoopGroup;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author: zhangwei
  * @date: 22:28/2019-01-03
  */
 @SpringBootApplication
+@ComponentScan(basePackageClasses = ListannerSamples.class)
 public class GeccoApplicationDemo {
 
 
