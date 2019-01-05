@@ -11,7 +11,7 @@ public class NamedThreadFactory implements ThreadFactory {
 
     private String prefix;
 
-    private final AtomicInteger idx = new AtomicInteger();
+    private static final AtomicInteger idx = new AtomicInteger();
 
     public NamedThreadFactory(String prefix) {
         this.prefix = prefix;
