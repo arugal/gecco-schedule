@@ -9,7 +9,7 @@ import static com.geccocrawler.gecco.spider.internal.PrioprityQueueNode.*;
  * @date: 23:24/2019-01-01
  */
 public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends AbstractQueue<T>
-                                                                        implements PriotiryQueue<T>{
+        implements PriotiryQueue<T> {
 
     private static final PrioprityQueueNode[] EMPTY_ARRAY = new PrioprityQueueNode[0];
 
@@ -50,9 +50,9 @@ public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends Abstract
 
     @Override
     public void clear() {
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             T node = queue[i];
-            if(node != null) {
+            if (node != null) {
                 node.priorityQueueIndex(this, INDEX_NOT_IN_QUEUE);
                 queue[i] = null;
             }
@@ -67,18 +67,20 @@ public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends Abstract
 
     @Override
     public boolean offer(T e) {
-        if(e.priorityQueueIndex(this) != INDEX_NOT_IN_QUEUE){
+        if (e.priorityQueueIndex(this) != INDEX_NOT_IN_QUEUE) {
             throw new IllegalArgumentException("e.priorityQueueIndex(): " + e.priorityQueueIndex(this) +
                     " (expected: " + INDEX_NOT_IN_QUEUE + ") + e: " + e);
         }
-        if(size > queue.length){
-            // Use a policy which allows for a 0 initial capacity. Same policy as JDK's priority queue, double when
-            // "small", then grow by 50% when "large".
-            queue = Arrays.copyOf(queue, queue.length + ((queue.length < 64) ?
-                    (queue.length + 2) :
-                    (queue.length >>> 1)));
+        synchronized (this) {
+            if (size >= queue.length) {
+                // Use a policy which allows for a 0 initial capacity. Same policy as JDK's priority queue, double when
+                // "small", then grow by 50% when "large".
+                queue = Arrays.copyOf(queue, queue.length + ((queue.length < 64) ?
+                        (queue.length + 2) :
+                        (queue.length >>> 1)));
+            }
+            bubbleUp(size++, e);
         }
-        bubbleUp(size++, e);
         return true;
     }
 
@@ -87,16 +89,17 @@ public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends Abstract
         if (size == 0) {
             return null;
         }
-        T result = queue[0];
-        result.priorityQueueIndex(this, INDEX_NOT_IN_QUEUE);
+        synchronized (this) {
+            T result = queue[0];
+            result.priorityQueueIndex(this, INDEX_NOT_IN_QUEUE);
 
-        T last = queue[--size];
-        queue[size] = null;
-        if (size != 0) { // Make sure we don't add the last element back.
-            bubbleDown(0, last);
+            T last = queue[--size];
+            queue[size] = null;
+            if (size != 0) { // Make sure we don't add the last element back.
+                bubbleDown(0, last);
+            }
+            return result;
         }
-
-        return result;
     }
 
     @Override
@@ -119,27 +122,28 @@ public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends Abstract
     @Override
     public boolean removeTyped(T node) {
         int i = node.priorityQueueIndex(this);
-        if (!contains(node, i)) {
-            return false;
-        }
+        synchronized (this) {
+            if (!contains(node, i)) {
+                return false;
+            }
+            node.priorityQueueIndex(this, INDEX_NOT_IN_QUEUE);
+            if (--size == 0 || size == i) {
+                // If there are no node left, or this is the last node in the array just remove and return.
+                queue[i] = null;
+                return true;
+            }
 
-        node.priorityQueueIndex(this, INDEX_NOT_IN_QUEUE);
-        if (--size == 0 || size == i) {
-            // If there are no node left, or this is the last node in the array just remove and return.
-            queue[i] = null;
-            return true;
-        }
+            // Move the last element where node currently lives in the array.
+            T moved = queue[i] = queue[size];
+            queue[size] = null;
+            // priorityQueueIndex will be updated below in bubbleUp or bubbleDown
 
-        // Move the last element where node currently lives in the array.
-        T moved = queue[i] = queue[size];
-        queue[size] = null;
-        // priorityQueueIndex will be updated below in bubbleUp or bubbleDown
-
-        // Make sure the moved node still preserves the min-heap properties.
-        if (comparator.compare(node, moved) < 0) {
-            bubbleDown(i, moved);
-        } else {
-            bubbleUp(i, moved);
+            // Make sure the moved node still preserves the min-heap properties.
+            if (comparator.compare(node, moved) < 0) {
+                bubbleDown(i, moved);
+            } else {
+                bubbleUp(i, moved);
+            }
         }
         return true;
     }
@@ -147,21 +151,24 @@ public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends Abstract
     @Override
     public void priorityChanged(T node) {
         int i = node.priorityQueueIndex(this);
-        if (!contains(node, i)) {
-            return;
-        }
+        synchronized (this) {
+            if (!contains(node, i)) {
+                return;
+            }
 
-        // Preserve the min-heap property by comparing the new priority with parents/children in the heap.
-        if (i == 0) {
-            bubbleDown(i, node);
-        } else {
-            // Get the parent to see if min-heap properties are violated.
-            int iParent = (i - 1) >>> 1;
-            T parent = queue[iParent];
-            if (comparator.compare(node, parent) < 0) {
-                bubbleUp(i, node);
-            } else {
+            // Preserve the min-heap property by comparing the new priority with parents/children in the heap.
+
+            if (i == 0) {
                 bubbleDown(i, node);
+            } else {
+                // Get the parent to see if min-heap properties are violated.
+                int iParent = (i - 1) >>> 1;
+                T parent = queue[iParent];
+                if (comparator.compare(node, parent) < 0) {
+                    bubbleUp(i, node);
+                } else {
+                    bubbleDown(i, node);
+                }
             }
         }
     }
@@ -215,10 +222,9 @@ public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends Abstract
         }
     }
 
-    private boolean contains(PrioprityQueueNode node, int i){
-        return  i >= 0 && i < size && node.equals(queue[i]);
+    private boolean contains(PrioprityQueueNode node, int i) {
+        return i >= 0 && i < size && node.equals(queue[i]);
     }
-
 
 
     private void bubbleDown(int k, T node) {
@@ -252,7 +258,7 @@ public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends Abstract
         node.priorityQueueIndex(this, k);
     }
 
-    // 插入排序
+    // 堆排序
     private void bubbleUp(int k, T node) {
         while (k > 0) {
             int iParent = (k - 1) >>> 1;

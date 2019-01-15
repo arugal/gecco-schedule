@@ -27,8 +27,7 @@ public class GeccoApplicationDemo {
         ApplicationContext context = new SpringApplicationBuilder(GeccoApplicationDemo.class).run(args);
 
         SpiderLoopGroup group = context.getBean(SpiderLoopGroup.class);
-
-        for(String url : urls){
+        for (String url : urls) {
             group.executor(url);
         }
     }
