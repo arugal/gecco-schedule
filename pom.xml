@@ -4,10 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.geccocrawler</groupId>
+    <groupId>com.github.sunnus3</groupId>
     <artifactId>gecco-schedule</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.1</version>
+    <version>1.3.0</version>
+    <url>https://github.com/Sunnus3/gecco-schedule</url>
+    <name>gecco-schedule</name>
+    <description>gecco schedule</description>
+
     <modules>
         <module>gecco-core</module>
         <module>gecco-spring-boot-project</module>
@@ -16,9 +20,44 @@
         <module>gecco-spring-boot-samples</module>
     </modules>
 
-    <name>gecco-schedule</name>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-    <url>https://github.com/Sunnus3/gecco-schedule</url>
+    <scm>
+        <connection>scm:git:https://github.com/Sunnus3/gecco-schedule.git</connection>
+        <developerConnection>scm:git:git@github.com:Sunnus3/gecco-schedule.git</developerConnection>
+        <url>git@github.com:Sunnus3/gecco-schedule.git</url>
+        <tag>0.1</tag>
+    </scm>
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/Sunnus3/gecco-schedule/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <name>Sunnus3</name>
+            <email>pknfe@outlook.com</email>
+        </developer>
+    </developers>
+
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>releases</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>releases</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+    </distributionManagement>
+
 
     <properties>
         <java.version>1.8</java.version>
@@ -27,7 +66,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lombok.version>1.18.4</lombok.version>
-        <gecco.version>1.3.1</gecco.version>
+        <gecco.version>1.3.0</gecco.version>
     </properties>
 
     <dependencyManagement>
@@ -61,19 +100,6 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-source</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -101,4 +127,57 @@
         </pluginManagement>
     </build>
 
+
+    <profiles>
+        <profile>
+            <id>relese</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.2</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <additionalparam>-Xdoclint:none</additionalparam>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

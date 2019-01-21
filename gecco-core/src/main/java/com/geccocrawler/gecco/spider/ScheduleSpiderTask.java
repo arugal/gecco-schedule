@@ -89,14 +89,14 @@ public class ScheduleSpiderTask extends ScheduleTask {
             }
         }catch (Exception e){
             log.error(String.format("%s ERROR %s/%s", request.getUrl(), e.getClass().getName(), e.getMessage()), e);
-            if(e instanceof DownloadTimeoutException){
-                // 开启代理，并且获取代理不为 null
-                if(engine.isProxy() && engine.getProxysLoader().getProxy() != null){
-                    if(log.isDebugEnabled()){
-                        log.debug(request.getUrl()+" ERROR : connect time out!");
-                    }
-                }
-            }
+//            if(e instanceof DownloadTimeoutException){
+//                // 开启代理，并且获取代理不为 null
+//                if(engine.isProxy() && engine.getProxysLoader().getProxy() != null){
+//                    if(log.isDebugEnabled()){
+//                        log.debug(request.getUrl()+" ERROR : connect time out!");
+//                    }
+//                }
+//            }
         }finally {
             if(response != null){
                 response.close();

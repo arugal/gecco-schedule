@@ -41,13 +41,13 @@ public class SpiderLoopGroup extends MultiSpiderExecutorGroup{
             engine.proxysLoader(spiderConfig.getProxys());
         }
 
-        engine.monitor(spiderConfig.isMobile())
-                .debug(spiderConfig.isDebug())
+
+//        engine.monitor(spiderConfig.isMobile()) 1.3.0 版本暂时不支持 monitor 设置
+                engine.debug(spiderConfig.isDebug())
                 .proxy(spiderConfig.isProxy())
                 .retry(spiderConfig.getRetry())
                 .thread(1)
-                .loop(true)
-                .monitor(false);
+                .loop(true);
         engine.run();
         engine.engineStop();
         return engine;

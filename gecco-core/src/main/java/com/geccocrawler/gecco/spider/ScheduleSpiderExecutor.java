@@ -4,7 +4,6 @@ import com.geccocrawler.gecco.request.HttpGetRequest;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.spider.internal.DefaultPriorityQueue;
 import com.geccocrawler.gecco.spider.internal.PriotiryQueue;
-import com.sun.istack.internal.NotNull;
 import lombok.NonNull;
 
 import java.util.Comparator;
@@ -123,7 +122,7 @@ public abstract class ScheduleSpiderExecutor extends AbstractSpiderExecutor {
     }
 
     @Override
-    public void scheduleWithFixedDelay(@NotNull String url, long initalDelay, long delay, @NonNull TimeUnit unit) {
+    public void scheduleWithFixedDelay(@NonNull String url, long initalDelay, long delay, @NonNull TimeUnit unit) {
         scheduleWithFixedDelay(new HttpGetRequest(url), initalDelay, delay, unit);
     }
 
