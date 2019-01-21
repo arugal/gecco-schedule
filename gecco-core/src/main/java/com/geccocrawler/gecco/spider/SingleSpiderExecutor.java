@@ -6,6 +6,7 @@ import com.geccocrawler.gecco.spider.linstener.SpiderExecutorListener;
 import com.geccocrawler.gecco.spider.linstener.SpiderExecutorListenerSupport;
 import com.geccocrawler.gecco.util.ObjectUtil;
 import com.geccocrawler.gecco.util.SystemPropertyUtil;
+import lombok.NonNull;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -53,9 +54,7 @@ public abstract class SingleSpiderExecutor extends ScheduleSpiderExecutor {
 
     private static final long SCHEDULE_PURGE_INTERVAL = TimeUnit.SECONDS.toNanos(1);
 
-    private static final long MAX_SCHEDULE_PURGE_INTERVAL = TimeUnit.SECONDS.toNanos(5);
-
-    private static final long DEFAULTE_WAIT_TIME = 500L;
+    private static final long MAX_SCHEDULE_PURGE_INTERVAL = TimeUnit.SECONDS.toNanos(2);
 
     protected SingleSpiderExecutor(SpiderExecutorGroup parent){
         this(parent, new NamedThreadFactory("thread-pool"));
@@ -74,11 +73,12 @@ public abstract class SingleSpiderExecutor extends ScheduleSpiderExecutor {
     }
 
 
-    protected SingleSpiderExecutor(SpiderExecutorGroup parent, Executor executor, int maxPendingTasks, RejectedExecutionHandler rejectedExecutionHandler) {
+    protected SingleSpiderExecutor(@NonNull SpiderExecutorGroup parent, @NonNull Executor executor, int maxPendingTasks,
+                                   @NonNull RejectedExecutionHandler rejectedExecutionHandler) {
         super(parent);
-        this.executor = ObjectUtil.checkNotNull(executor, "executor");
+        this.executor = executor;
         this.maxPendingTasks = Math.max(16, maxPendingTasks);
-        this.taskQueue = newTaskQueue(maxPendingTasks);
+        this.taskQueue = newTaskQueue(this.maxPendingTasks);
         this.rejectedExecutionHandler = ObjectUtil.checkNotNull(rejectedExecutionHandler, "rejectedExecutionHandler");
     }
 
@@ -87,21 +87,19 @@ public abstract class SingleSpiderExecutor extends ScheduleSpiderExecutor {
     }
 
     @Override
-    public void executor(String url) {
-        ObjectUtil.checkNotNull(url, "url");
+    public void executor(@NonNull String url) {
         executor(new HttpGetRequest(url));
     }
 
     @Override
-    public void executor(HttpRequest request) {
-        ObjectUtil.checkNotNull(request, "request");
+    public void executor(@NonNull HttpRequest request) {
         addTask(newScheduleTask(request));
         startThread();
     }
 
     protected abstract ScheduleTask newScheduleTask(HttpRequest request);
 
-        @Override
+    @Override
     public void startThread() {
         if(state == ST_NOT_STARTED){
             if(STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)){
@@ -139,7 +137,6 @@ public abstract class SingleSpiderExecutor extends ScheduleSpiderExecutor {
     protected abstract void run();
 
     protected void cleanup(){
-
         if(taskQueue != null){
             taskQueue.clear();
         }
@@ -152,17 +149,23 @@ public abstract class SingleSpiderExecutor extends ScheduleSpiderExecutor {
     @Override
     public final void pause() {
         if(state == ST_STARTED){
-            if(STATE_UPDATER.compareAndSet(this, ST_STARTED, ST_PAUSEED)){
+            if (STATE_UPDATER.compareAndSet(this, ST_STARTED, ST_PAUSEED)) {
                 listanerSupport.onPause(this);
             }
         }
     }
 
+    /**
+     * 探测是否暂停
+     * 如果 state 处于暂停状态,则阻塞线程
+     */
     protected final void pauseExplore(){
         if(isPause()){
             try {
                 synchronized (this) {
-                    this.wait();
+                    if(isPause()) {
+                        this.wait();
+                    }
                 }
             } catch (InterruptedException e) {
                 // ignore
@@ -189,7 +192,9 @@ public abstract class SingleSpiderExecutor extends ScheduleSpiderExecutor {
         if(oldState < ST_SHUTTING_DOWN){
             if(STATE_UPDATER.compareAndSet(this, oldState, ST_SHUTTING_DOWN)){
                 try {
-                    this.notifyAll();
+                    if(thread != null && !thread.isInterrupted()){
+                        thread.interrupt();// 将线程从阻塞状态中断
+                    }
                 }catch (Exception e){
                     // ignore
                 }
@@ -198,6 +203,10 @@ public abstract class SingleSpiderExecutor extends ScheduleSpiderExecutor {
         }
     }
 
+    @Override
+    public boolean isRuning() {
+        return state == ST_STARTED;
+    }
 
     @Override
     public boolean isPause() {
@@ -253,11 +262,12 @@ public abstract class SingleSpiderExecutor extends ScheduleSpiderExecutor {
             }else {
                 task = blockTaskQueue.poll();
             }
-            if(task != null){
+            if(task != null && isRuning()){
+                pauseExplore(); // 响应暂停
                 safeExecute(task);
                 ranAtLeastOne = true;
             }
-        }while (task != null && !isShuttingDown());
+        }while (task != null && isRuning());
 
         if(ranAtLeastOne){
             updateLastExecutionTime();

@@ -4,7 +4,8 @@ import com.geccocrawler.gecco.request.HttpGetRequest;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.spider.internal.DefaultPriorityQueue;
 import com.geccocrawler.gecco.spider.internal.PriotiryQueue;
-import com.geccocrawler.gecco.util.ObjectUtil;
+import com.sun.istack.internal.NotNull;
+import lombok.NonNull;
 
 import java.util.Comparator;
 import java.util.Queue;
@@ -91,15 +92,12 @@ public abstract class ScheduleSpiderExecutor extends AbstractSpiderExecutor {
 
 
     @Override
-    public void schedule(String url, long delay, TimeUnit unit) {
-        ObjectUtil.checkNotNull(url, "url");
+    public void schedule(@NonNull String url, long delay, @NonNull TimeUnit unit) {
         schedule(new HttpGetRequest(url), delay, unit);
     }
 
     @Override
-    public void schedule(HttpRequest request, long delay, TimeUnit unit) {
-        ObjectUtil.checkNotNull(request, "request");
-        ObjectUtil.checkNotNull(unit, "unit");
+    public void schedule(@NonNull HttpRequest request, long delay, @NonNull TimeUnit unit) {
         if(delay < 0){
             delay = 0;
         }
@@ -107,15 +105,12 @@ public abstract class ScheduleSpiderExecutor extends AbstractSpiderExecutor {
     }
 
     @Override
-    public void scheduleAtFixedRate(String url, long initialDelay, long period, TimeUnit unit) {
-        ObjectUtil.checkNotNull(url, "url");
+    public void scheduleAtFixedRate(@NonNull String url, long initialDelay, long period, @NonNull TimeUnit unit) {
         scheduleAtFixedRate(new HttpGetRequest(url), initialDelay, period, unit);
     }
 
     @Override
-    public void scheduleAtFixedRate(HttpRequest request, long initialDelay, long period, TimeUnit unit) {
-        ObjectUtil.checkNotNull(request, "request");
-        ObjectUtil.checkNotNull(unit, "unit");
+    public void scheduleAtFixedRate(@NonNull HttpRequest request, long initialDelay, long period, @NonNull TimeUnit unit) {
         if(initialDelay < 0){
             throw new IllegalArgumentException(
                     String.format("initialDelay: %d (expected: >= 0)", initialDelay));
@@ -128,15 +123,12 @@ public abstract class ScheduleSpiderExecutor extends AbstractSpiderExecutor {
     }
 
     @Override
-    public void scheduleWithFixedDelay(String url, long initalDelay, long delay, TimeUnit unit) {
-        ObjectUtil.checkNotNull(url, "url");
+    public void scheduleWithFixedDelay(@NotNull String url, long initalDelay, long delay, @NonNull TimeUnit unit) {
         scheduleWithFixedDelay(new HttpGetRequest(url), initalDelay, delay, unit);
     }
 
     @Override
-    public void scheduleWithFixedDelay(HttpRequest request, long initialDelay, long delay, TimeUnit unit) {
-        ObjectUtil.checkNotNull(request, "request");
-        ObjectUtil.checkNotNull(unit, "unit");
+    public void scheduleWithFixedDelay(@NonNull HttpRequest request, long initialDelay, long delay, @NonNull TimeUnit unit) {
         if (initialDelay < 0) {
             throw new IllegalArgumentException(
                     String.format("initialDelay: %d (expected: >= 0)", initialDelay));

@@ -15,9 +15,9 @@ public class DefaultPriorityQueue<T extends PrioprityQueueNode> extends Abstract
 
     private final Comparator<T> comparator;
 
-    private T[] queue;
+    private volatile T[] queue;
 
-    private int size;
+    private volatile int size;
 
     public DefaultPriorityQueue(Comparator<T> comparator, int initialSize) {
         this.comparator = comparator;

@@ -95,6 +95,17 @@ public abstract class MultiSpiderExecutorGroup implements SpiderExecutorGroup {
         }
     }
 
+
+    @Override
+    public boolean isRuning() {
+        for(SpiderExecutor executor : children){
+            if(executor.isRuning()){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean isPause() {
         for(SpiderExecutor executor : children){

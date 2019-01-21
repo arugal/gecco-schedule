@@ -94,6 +94,12 @@ public interface SpiderExecutorGroup {
     void shutdown();
 
     /**
+     * 是否正在运行
+     * @return
+     */
+    boolean isRuning();
+
+    /**
      * 是否暂停
      * @return
      */
