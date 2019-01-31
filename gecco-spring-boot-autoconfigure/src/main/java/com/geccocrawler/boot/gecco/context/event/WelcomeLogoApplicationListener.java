@@ -22,21 +22,13 @@ public class WelcomeLogoApplicationListener implements ApplicationListener<Appli
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-        if(processed.get()){
-            return;
+        if(!processed.get() && processed.compareAndSet(false, true)) {
+            final Log logger = LogFactory.getLog(getClass());
+            String bannerText = buildBannerText();
+            if (logger.isInfoEnabled()) {
+                logger.info(bannerText);
+            }
         }
-
-        final Log logger = LogFactory.getLog(getClass());
-
-        String bannerText = buildBannerText();
-
-        if(logger.isInfoEnabled()){
-            logger.info(bannerText);
-        }else{
-            System.out.println(bannerText);
-        }
-
-        processed.compareAndSet(false, true);
     }
 
     String buildBannerText(){
@@ -46,10 +38,10 @@ public class WelcomeLogoApplicationListener implements ApplicationListener<Appli
         bannerTextBuilder
                 .append(LINE_SEPARATOR)
                 .append(LINE_SEPARATOR)
-                .append(" :: Gecco Spring Boot (v").append("1.3.1").append(") : ")
+                .append(" :: Gecco Spring Boot (v").append("1.3.0").append(") : ")
                 .append(GECCO_SPRINT_BOOT_GITHUB_URL)
                 .append(LINE_SEPARATOR)
-                .append(" :: Gecco (v").append("1.3.1").append(") : ")
+                .append(" :: Gecco (v").append("1.3.0").append(") : ")
                 .append(GECCO_GITHUB_URL)
                 .append(LINE_SEPARATOR);
 
