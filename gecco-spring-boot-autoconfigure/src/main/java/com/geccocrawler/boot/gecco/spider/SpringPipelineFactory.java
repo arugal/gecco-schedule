@@ -16,10 +16,18 @@ public class SpringPipelineFactory implements PipelineFactory, ApplicationContex
 
     private ApplicationContext context;
 
+    private final Class<Pipeline> pip = Pipeline.class;
+
     @Override
     public Pipeline<? extends SpiderBean> getPipeline(String s) {
         ObjectUtil.checkNotNull(s, "pipelineName");
-        return context.getBean(s, Pipeline.class);
+        String [] beanNames = context.getBeanNamesForType(pip);
+        for(String name : beanNames){
+            if(name.equals(s)){
+                return context.getBean(s, pip);
+            }
+        }
+        return null;
     }
 
     @Override
